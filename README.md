@@ -30,6 +30,30 @@ python scaffold.py
 - [x] **18.** compression_report
 - [x] **19.** compress_for_budget
 
----
+## Results
 
-Built on Deep-ML.
+```
+teacher: 105,866 params, 0.4235 MB fp32, 0.314 ms/frame (3184.7 FPS), accuracy 0.807
+
+pruning to 90% sparsity: one-shot accuracy 0.586 vs iterative 0.819  (schedule [0.6333, 0.8667, 0.9])
+  sparse storage 0.0639 MB vs dense 0.4235 MB; break-even sparsity 0.3333
+
+weight quantization of the teacher:
+   8-bit per-channel: 0.1062 MB, accuracy 0.809, fc1 SNR 41.18 dB
+   4-bit per-channel: 0.0534 MB, accuracy 0.814, fc1 SNR 15.99 dB
+   2-bit per-channel: 0.0269 MB, accuracy 0.266, fc1 SNR 1.43 dB
+  measured gain per bit on fc1 (per-tensor): 5.99 dB (theory: 6.02)
+  calibrated activation absmax: conv1 1.62, conv2 3.47, fc1 33.48, fc2 21.63
+
+student (8,16,32): 26,698 params, 0.1068 MB
+  distilled accuracy 0.753 vs plain 0.74 (gain +0.013); teacher 0.807
+  (toy scale: the gain moves by a point or two across seeds)
+
+budget: <= 0.03 MB, <= 33.3 ms per frame (30 FPS), accuracy >= 0.707
+  (latency on this CPU is far under the 30 FPS line, so size and accuracy decide; on a phone profiler this same table is what you would show)
+  teacher   0.4235 MB  0.313 ms  acc 0.807  sparsity 0.00  [size/latency/acc nYY]
+  distilled 0.1068 MB  0.247 ms  acc 0.753  sparsity 0.00  [size/latency/acc nYY]
+  pruned    0.0322 MB  0.245 ms  acc 0.762  sparsity 0.80  [size/latency/acc nYY]
+  quantized 0.0160 MB  0.246 ms  acc 0.762  sparsity 0.80  [size/latency/acc YYY]
+budget met: True at stage 'quantized'
+```
